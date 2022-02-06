@@ -18,7 +18,6 @@ KivyMain():
   var demoData = WidgetsBasicData()
 
   KivyLoop:
-
     if show_demo:
       igShowDemoWindow(show_demo.addr)
 
