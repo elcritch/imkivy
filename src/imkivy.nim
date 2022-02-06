@@ -1,5 +1,6 @@
 import macros
 import sugar
+import strutils
 
 import imgui, imgui/[impl_opengl, impl_glfw]
 import nimgl/[opengl, glfw]
@@ -46,7 +47,6 @@ macro mkUniqueId*(line: untyped): untyped =
     igPopId()
   echo "mkUniqueId: ", result.repr
 
-template Button*(text: string) = igButton(text)
 template WidgetUniqueId*(blk: untyped) = mkUniqueId(blk)
 
 macro mkButton(label: string, btn, blk: untyped) =
@@ -96,6 +96,7 @@ macro mkButton(label: string, btn, blk: untyped) =
       `res`
       igPopButtonRepeat()
 
+template Button*(text: string) = igButton(text)
 template Button*(label: string, blk: untyped) =
   mkButton(label, igButton, blk)
 template ArrowButton*(label: string, blk: untyped) =
@@ -108,8 +109,63 @@ template RadioButton*(label: string, idx: var int32, val: int) =
   mkUniqueId():
     igRadioButton(label, idx.addr, val)
 
+template Tooltip*(blk: untyped) =
+  igBeginTooltip()
+  blk
+  igEndTooltip()
+
+var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
+
+template PlotDataLines*(
+            label: string,
+            data: openArray[float32],
+            overlay_text: string = "",
+            scale_min: float32 = FLT_MAX,
+            scale_max: float32 = FLT_MAX,
+            graph_size: ImVec2 = ImVec2(x: 0, y: 0)
+          ) =
+  igPlotLines(
+    label.cstring, data[0].unsafeAddr(), data.len().int32,
+    0'i32, overlay_text, scale_min, scale_max, graph_size,
+    stride = sizeof(float32).int32)
+
+template PlotDataLines*[T](
+            label: string,
+            dataProc: proc (data: ptr T, idx: int32): float32 {.cdecl.},
+            data: T,
+            count: int32,
+            overlay_text: string = "",
+            scale_min: float32 = FLT_MAX,
+            scale_max: float32 = FLT_MAX,
+            graph_size: ImVec2 = ImVec2(x: 0, y: 0)
+          ) =
+  igPlotLines(
+    label.cstring,
+    dataProc,
+    data.unsafeAddr(),
+    count,
+    0'i32, overlay_text,
+    scale_min, scale_max, graph_size,
+    stride = sizeof(float32).int32)
+
+  # proc igPlotLines*(label: cstring, values: ptr float32, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0), stride: int32 = sizeof(float32).int32): void {.importc: "igPlotLines_FloatPtr".}
+  # proc igPlotLines(label: cstring,
+  # values_getter: proc(data: pointer, idx: int32): float32 {.cdecl, varargs.},
+  # data: pointer,
+  # values_count: int32, values_offset: int32 = 0,
+  # overlay_text: cstring = nil,
+  # scale_min: float32 = high(float32), scale_max: float32 = high(float32),
+  # graph_size: ImVec2 = ImVec2(x: 0, y: 0)): void {.importc: "igPlotLines_FnFloatPtr".}
+
+# proc igPlotLines*(label: cstring, values: ptr float32, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0), stride: int32 = sizeof(float32).int32): void {.importc: "igPlotLines_FloatPtr".}
+# proc igPlotLines*(label: cstring, values_getter: proc(data: pointer, idx: int32): float32 {.cdecl, varargs.}, data: pointer, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0)): void {.importc: "igPlotLines_FnFloatPtr".}
+
 template ShowWhen*(val: bool, blk: untyped) =
   if val: blk else: Text("")
+template ShowOnItemIsHovered*(blk: untyped) =
+  if igIsItemHovered(): blk
+template SetToolTip*(label: string) =
+  igSetTooltip(label.cstring)
 
 macro RadioButtons*(variable: int32, horiz: static[bool] = true, values: untyped) =
   var res = newStmtList()
@@ -126,14 +182,12 @@ macro RadioButtons*(variable: int32, horiz: static[bool] = true, values: untyped
   result = newBlockStmt(res)
   echo "radiobuttons: ", result.repr
 
-template RadioButton*(label: string, idx: var int32, val: int) =
-  mkUniqueId():
-    igRadioButton(label, idx.addr, val)
 
 macro Horizontal*(blk: untyped) =
   result = newStmtList()
   for idx, child in blk.pairs():
     result.add child
+    echo "Horizontal: ", child[0].repr.startsWith("Show")
     if idx + 1 < blk.len():
       result.add quote do:
         igSameLine()

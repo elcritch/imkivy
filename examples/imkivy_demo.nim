@@ -66,6 +66,24 @@ widget WidgetsBasic:
           on_press: self.rptCounter.inc()
         Text("%d", self.rptCounter)
 
+      Horizontal:
+        Text("Hover over me")
+        ShowOnItemIsHovered:
+          SetTooltip("I am a tooltip")
+        Text("- or me")
+        ShowOnItemIsHovered:
+          Tooltip:
+            Text("I am a fancy tooltip")
+            let arr = [0.6'f32, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f]
+            PlotDataLines("Curve", arr)
+
+      Text("times")
+      Text("times")
+      var arr = [0.6'f32, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f ]
+
+      # PlotDataLines("Frame Times", arr)
+      # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
+
 KivyMain():
 
   var show_demo: bool = true
