@@ -18,6 +18,7 @@ widget WidgetsBasic:
     radio2: int32
     rptCounter: int32
     itemCurrent: int32
+    str0: string
 
   # Simple window
   Window("Widgets"):
@@ -30,11 +31,6 @@ widget WidgetsBasic:
           Text("Thanks for clicking me! ")
 
       Checkbox("checkbox", self.check)
-
-      Horizontal:
-        RadioButton("radio a", self.radio, 0)
-        RadioButton("radio b", self.radio, 1)
-        RadioButton("radio c", self.radio, 2)
 
       RadioButtons(self.radio2, horiz=true):
         ("radio a", 0)
@@ -84,6 +80,7 @@ widget WidgetsBasic:
       let items = ["AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK"]
       Combo("combo", self.itemCurrent, items)
 
+      InputText("input text", self.str0, 5)
       # PlotDataLines("Frame Times", arr)
       # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 

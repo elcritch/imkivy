@@ -126,6 +126,15 @@ template Combo*(label: string, itemCurrent: var int32, items: openArray[string])
     vals.add item.cstring
   igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
 
+template InputText*(label: string, text: var string, size: int = -1) =
+  var ln: uint
+  when size > 0:
+    ln = size.uint
+  else:
+    ln = text.len().uint
+  text.setLen(ln)
+  igInputText(label.cstring, text.cstring, ln)
+
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
 template PlotDataLines*(
