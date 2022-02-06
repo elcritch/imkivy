@@ -116,6 +116,16 @@ template Tooltip*(blk: untyped) =
   blk
   igEndTooltip()
 
+template Separator*() = igSeparator()
+template LabelText*(label, text: string) =
+  igLabelText(label.cstring, text.cstring)
+
+template Combo*(label: string, itemCurrent: var int32, items: openArray[string]) =
+  var vals: seq[cstring] = newSeqOfCap[cstring](items.len())
+  for item in items:
+    vals.add item.cstring
+  igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
+
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
 template PlotDataLines*(

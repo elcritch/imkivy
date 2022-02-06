@@ -17,6 +17,7 @@ widget WidgetsBasic:
     radio: int32
     radio2: int32
     rptCounter: int32
+    itemCurrent: int32
 
   # Simple window
   Window("Widgets"):
@@ -77,29 +78,34 @@ widget WidgetsBasic:
             let arr = [0.6'f32, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f]
             PlotDataLines("Curve", arr)
 
-      Text("times")
-      Text("times")
-      var arr = [0.6'f32, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f ]
+      Separator()
+      LabelText("label", "Value")
+
+      let items = ["AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK"]
+      Combo("combo", self.itemCurrent, items)
 
       # PlotDataLines("Frame Times", arr)
       # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
-KivyMain():
+ImKivyMain():
 
   var show_demo: bool = true
   var bdData = WidgetsBasicData()
 
-  KivyLoop:
+  ImKivyLoop:
     if show_demo:
       igShowDemoWindow(show_demo.addr)
 
-    Window("Hello, world!"):
-      WidgetsBasic(bdData)
 
+    Window("Hello, world!"):
+
+      Text("Application average %.3f ms/frame (%.1f FPS)",
+           1000.0f / igGetIO().framerate, igGetIO().framerate)
       Button("Button"):
         size: (50, 20)
         on_press: 
           echo "demoData: ", repr(bdData)
 
+    WidgetsBasic(bdData)
 
 run()

@@ -11,12 +11,12 @@ import demo_window
 
 import std/os, std/times, std/monotimes
 
-KivyMain():
+ImKivyMain():
 
   var show_demo: bool = true
   var exData = ExampleWindowData()
 
-  KivyLoop:
+  ImKivyLoop:
     if show_demo:
       igShowDemoWindow(show_demo.addr)
 

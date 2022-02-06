@@ -7,11 +7,7 @@ import ../imkivy
 
 import std/os, std/times, std/monotimes
 
-template KivySetup*(before: untyped) =
-  proc setup() =
-    before
-
-template KivyLoop*(loop: untyped) =
+template ImKivyLoop*(loop: untyped) =
     while not w.windowShouldClose:
       glfwPollEvents()
 
@@ -34,12 +30,12 @@ template KivyLoop*(loop: untyped) =
       w.swapBuffers()
       var ct = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
       var dt = 1.0/65.0 - (ct - ft)
-      os.sleep(toInt(1000*dt))
+      # os.sleep(toInt(1000*dt))
 
       ft = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
 
 
-template KivyMain*(code: untyped) =
+template ImKivyMain*(code: untyped) =
   proc run() =
     assert glfwInit()
 
