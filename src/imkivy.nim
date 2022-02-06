@@ -100,10 +100,6 @@ template Button*(label: string, blk: untyped) =
   mkButton(label, igButton, blk)
 template ArrowButton*(label: string, blk: untyped) =
   mkButton(label, igArrowButton, blk)
-template ButtonRepeat*(val: bool, blk: untyped) =
-  igPushButtonRepeat(val)
-  blk
-  igPopButtonRepeat()
 
 template Slider*(label: string, val: var float, min = 0.0, max = 1.0) =
   igSliderFloat(label, val.addr, min, max)
