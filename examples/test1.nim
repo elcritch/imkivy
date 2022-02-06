@@ -15,7 +15,6 @@ KivyMain():
 
   var show_demo: bool = true
   var exData = ExampleWindowData()
-  var demoData = WidgetsBasicData()
 
   KivyLoop:
     if show_demo:
@@ -23,7 +22,6 @@ KivyMain():
 
     Window("Hello, world!"):
       ExampleWindow(exData)
-      WidgetsBasic(demoData)
       Button("Button"):
         size: (50, 20)
         on_press: 

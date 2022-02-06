@@ -47,11 +47,12 @@ macro mkUniqueId*(line: untyped): untyped =
   echo "mkUniqueId: ", result.repr
 
 template Button*(text: string) = igButton(text)
+template WidgetUniqueId*(blk: untyped) = mkUniqueId(blk)
 
-macro Button*(label: string, blk: untyped) =
-  # echo "button: blk: ", blk.treeRepr
+macro mkButton(label: string, btn, blk: untyped) =
   var onPressAct: NimNode
   var sizeProp: NimNode
+  var dirProp: NimNode
 
   for code in blk:
     if code.kind == nnkCall:
@@ -59,24 +60,32 @@ macro Button*(label: string, blk: untyped) =
       case name.repr:
       of "on_press":
         onPressAct = code[1]
+      of "dir":
+        dirProp = code[1]
       of "size":
         let val = code[1]
         sizeProp = quote do:
           let sz = `val`
           ImVec2(x: sz[0].toFloat(), y: sz[1].toFloat())
 
-  # btncnt.inc()
-  # var btnid = btncnt 
-  if sizeProp.isNil:
+  var arg1: NimNode =
+    if btn.strVal == "igArrowButton": dirProp
+    elif btn.strVal == "igButton": sizeProp
+    else: nil
+
+  if arg1.isNil:
     result = quote do:
       mkUniqueId():
-        if igButton(`label`):
-          `onPressAct`
+        if `btn`(`label`): `onPressAct`
   else:
     result = quote do:
       mkUniqueId():
-        if igButton(`label`, `sizeProp`):
-          `onPressAct`
+        if `btn`(`label`, `arg1`): `onPressAct`
+
+template Button*(label: string, blk: untyped) =
+  mkButton(label, igButton, blk)
+template ArrowButton*(label: string, blk: untyped) =
+  mkButton(label, igArrowButton, blk)
 
 template Slider*(label: string, val: var float, min = 0.0, max = 1.0) =
   igSliderFloat(label, val.addr, min, max)
