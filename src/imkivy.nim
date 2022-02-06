@@ -50,9 +50,11 @@ template Button*(text: string) = igButton(text)
 template WidgetUniqueId*(blk: untyped) = mkUniqueId(blk)
 
 macro mkButton(label: string, btn, blk: untyped) =
-  var onPressAct: NimNode
-  var sizeProp: NimNode
-  var dirProp: NimNode
+  var
+    onPressAct: NimNode
+    sizeProp: NimNode
+    dirProp: NimNode
+    repeatProp: NimNode
 
   for code in blk:
     if code.kind == nnkCall:
@@ -60,6 +62,8 @@ macro mkButton(label: string, btn, blk: untyped) =
       case name.repr:
       of "on_press":
         onPressAct = code[1]
+      of "repeat":
+        repeatProp = code[1]
       of "dir":
         dirProp = code[1]
       of "size":
@@ -73,19 +77,33 @@ macro mkButton(label: string, btn, blk: untyped) =
     elif btn.strVal == "igButton": sizeProp
     else: nil
 
+  var res = newStmtList()
   if arg1.isNil:
-    result = quote do:
+    res = quote do:
       mkUniqueId():
         if `btn`(`label`): `onPressAct`
   else:
-    result = quote do:
+    res = quote do:
       mkUniqueId():
         if `btn`(`label`, `arg1`): `onPressAct`
+  
+  result = newStmtList()
+  if repeatProp.isNil:
+    result.add res
+  else:
+    result.add quote do:
+      igPushButtonRepeat(`repeatProp`)
+      `res`
+      igPopButtonRepeat()
 
 template Button*(label: string, blk: untyped) =
   mkButton(label, igButton, blk)
 template ArrowButton*(label: string, blk: untyped) =
   mkButton(label, igArrowButton, blk)
+template ButtonRepeat*(val: bool, blk: untyped) =
+  igPushButtonRepeat(val)
+  blk
+  igPopButtonRepeat()
 
 template Slider*(label: string, val: var float, min = 0.0, max = 1.0) =
   igSliderFloat(label, val.addr, min, max)

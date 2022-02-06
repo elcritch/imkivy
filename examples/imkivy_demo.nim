@@ -56,14 +56,14 @@ widget WidgetsBasic:
 
       Horizontal:
         Text("Hold to repeat:")
-        igPushButtonRepeat(true)
         ArrowButton("##left"):
+          repeat: true
           dir: ImGuiDir.Left
           on_press: self.rptCounter.dec()
         ArrowButton("##right"):
+          repeat: true
           dir: ImGuiDir.Right
           on_press: self.rptCounter.inc()
-        igPopButtonRepeat()
         Text("%d", self.rptCounter)
 
 KivyMain():
