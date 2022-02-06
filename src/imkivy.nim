@@ -150,26 +150,6 @@ template PlotDataLines*[T](
     scale_min, scale_max, graph_size,
     stride = sizeof(float32).int32)
 
-  # proc igPlotLines*(label: cstring, values: ptr float32, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0), stride: int32 = sizeof(float32).int32): void {.importc: "igPlotLines_FloatPtr".}
-  # proc igPlotLines(label: cstring,
-  # values_getter: proc(data: pointer, idx: int32): float32 {.cdecl, varargs.},
-  # data: pointer,
-  # values_count: int32, values_offset: int32 = 0,
-  # overlay_text: cstring = nil,
-  # scale_min: float32 = high(float32), scale_max: float32 = high(float32),
-  # graph_size: ImVec2 = ImVec2(x: 0, y: 0)): void {.importc: "igPlotLines_FnFloatPtr".}
-
-# proc igPlotLines*(label: cstring, values: ptr float32, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0), stride: int32 = sizeof(float32).int32): void {.importc: "igPlotLines_FloatPtr".}
-# proc igPlotLines*(label: cstring, values_getter: proc(data: pointer, idx: int32): float32 {.cdecl, varargs.}, data: pointer, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0)): void {.importc: "igPlotLines_FnFloatPtr".}
-
-# macro mkCheckHorizontalMode*() =
-#   if HorizontalMode:
-#     result = quote do:
-#       igSameLine()
-#     echo "HorizontalMode: true: ", repr(result)
-#   else:
-#     result = newStmtList()
-#     echo "HorizontalMode: false: ", repr(result)
 
 macro ShowWhen*(val: bool, blk: untyped) =
   if HorizontalMode:
