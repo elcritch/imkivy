@@ -36,6 +36,8 @@ proc ImColorHSV*(h: float32, s: float32, v: float32, a: float32 = 1.0f): ImVec4 
 
 var
   ItemIds {.compileTime.} = 0
+  HorizontalMode {.compileTime.} = false
+
 
 macro mkUniqueId*(line: untyped): untyped =
   ItemIds.inc()
@@ -160,10 +162,30 @@ template PlotDataLines*[T](
 # proc igPlotLines*(label: cstring, values: ptr float32, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0), stride: int32 = sizeof(float32).int32): void {.importc: "igPlotLines_FloatPtr".}
 # proc igPlotLines*(label: cstring, values_getter: proc(data: pointer, idx: int32): float32 {.cdecl, varargs.}, data: pointer, values_count: int32, values_offset: int32 = 0, overlay_text: cstring = nil, scale_min: float32 = high(float32), scale_max: float32 = high(float32), graph_size: ImVec2 = ImVec2(x: 0, y: 0)): void {.importc: "igPlotLines_FnFloatPtr".}
 
-template ShowWhen*(val: bool, blk: untyped) =
-  if val: blk else: Text("")
-template ShowOnItemIsHovered*(blk: untyped) =
-  if igIsItemHovered(): blk
+# macro mkCheckHorizontalMode*() =
+#   if HorizontalMode:
+#     result = quote do:
+#       igSameLine()
+#     echo "HorizontalMode: true: ", repr(result)
+#   else:
+#     result = newStmtList()
+#     echo "HorizontalMode: false: ", repr(result)
+
+macro ShowWhen*(val: bool, blk: untyped) =
+  if HorizontalMode:
+    result = quote do:
+      if `val`:
+        igSameLine()
+        `blk`
+  else:
+    result = quote do:
+      if `val`: `blk`
+
+macro ShowOnItemIsHovered*(blk: untyped) =
+  result = quote do:
+    if igIsItemHovered():
+      `blk`
+
 template SetToolTip*(label: string) =
   igSetTooltip(label.cstring)
 
@@ -180,18 +202,24 @@ macro RadioButtons*(variable: int32, horiz: static[bool] = true, values: untyped
       res.add quote do:
         igSameLine()
   result = newBlockStmt(res)
-  echo "radiobuttons: ", result.repr
+  # echo "radiobuttons: ", result.repr
 
+macro StopHorizontal*() =
+  HorizontalMode = false
 
 macro Horizontal*(blk: untyped) =
+  HorizontalMode = true
   result = newStmtList()
   for idx, child in blk.pairs():
     result.add child
-    echo "Horizontal: ", child[0].repr.startsWith("Show")
     if idx + 1 < blk.len():
+      if  blk[idx+1][0].repr().startsWith("Show"):
+        continue
       result.add quote do:
         igSameLine()
-  # result.add quote do: igNewLine()
+  result.add quote do:
+    StopHorizontal()
+  echo "Horizontal: repr: ", result.repr
 
 macro widget*(class: untyped, blk: untyped) =
   var objectFields: NimNode
