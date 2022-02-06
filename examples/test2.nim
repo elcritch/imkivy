@@ -13,25 +13,11 @@ import std/os, std/times, std/monotimes
 
 KivyMain():
 
-  var style = igGetStyle()
-  style.framePadding = ImVec2(x: 5, y: 5) 
-  style.cellPadding = ImVec2(x: 7, y: 4) 
-  style.itemSpacing = ImVec2(x: 11, y: 5) 
-  style.itemInnerSpacing = ImVec2(x: 7, y: 2) 
-  style.scrollbarSize = 24.0
-  style.grabMinSize = 24.0
-
   var show_demo: bool = true
-  
   var exData = ExampleWindowData()
   var demoData = WidgetsBasicData()
 
-do:
-    glfwPollEvents()
-
-    igOpenGL3NewFrame()
-    igGlfwNewFrame()
-    igNewFrame()
+  KivyLoop:
 
     if show_demo:
       igShowDemoWindow(show_demo.addr)
@@ -45,4 +31,4 @@ do:
           echo "demoData: ", repr(demoData)
 
 
-main()
+run()

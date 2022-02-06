@@ -7,40 +7,40 @@ import ../imkivy
 
 import std/os, std/times, std/monotimes
 
-template KivyRun*(before, loop: untyped) =
-  var ft = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
+template KivySetup*(before: untyped) =
+  proc setup() =
+    before
 
-  before
+template KivyLoop*(loop: untyped) =
+    while not w.windowShouldClose:
+      glfwPollEvents()
 
-  while not w.windowShouldClose:
-    glfwPollEvents()
+      igOpenGL3NewFrame()
+      igGlfwNewFrame()
+      igNewFrame()
 
-    igOpenGL3NewFrame()
-    igGlfwNewFrame()
-    igNewFrame()
+      if show_demo:
+        igShowDemoWindow(show_demo.addr)
 
-    if show_demo:
-      igShowDemoWindow(show_demo.addr)
+      loop
 
-    loop
+      igRender()
 
-    igRender()
+      glClearColor(0.45f, 0.55f, 0.60f, 1.00f)
+      glClear(GL_COLOR_BUFFER_BIT)
 
-    glClearColor(0.45f, 0.55f, 0.60f, 1.00f)
-    glClear(GL_COLOR_BUFFER_BIT)
+      igOpenGL3RenderDrawData(igGetDrawData())
 
-    igOpenGL3RenderDrawData(igGetDrawData())
+      w.swapBuffers()
+      var ct = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
+      var dt = 1.0/65.0 - (ct - ft)
+      os.sleep(toInt(1000*dt))
 
-    w.swapBuffers()
-    var ct = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
-    var dt = 1.0/65.0 - (ct - ft)
-    os.sleep(toInt(1000*dt))
-
-    ft = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
+      ft = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
 
 
-template KivyMain*(KivyBefore, KivyLoop: untyped) =
-  proc main() =
+template KivyMain*(code: untyped) =
+  proc run() =
     assert glfwInit()
 
     glfwWindowHint(GLFWContextVersionMajor, 4)
@@ -49,7 +49,7 @@ template KivyMain*(KivyBefore, KivyLoop: untyped) =
     glfwWindowHint(GLFWOpenglProfile, GLFW_OPENGL_CORE_PROFILE)
     glfwWindowHint(GLFWResizable, GLFW_FALSE)
 
-    var w: GLFWWindow = glfwCreateWindow(1280, 720)
+    var w {.inject.}: GLFWWindow = glfwCreateWindow(1280, 720)
     if w == nil:
       quit(-1)
 
@@ -73,8 +73,9 @@ template KivyMain*(KivyBefore, KivyLoop: untyped) =
     style.scrollbarSize = 24.0
     style.grabMinSize = 24.0
 
-    KivyBefore
-    KivyLoop
+    var ft {.inject.} = getMonoTime().ticks().toBiggestFloat() * 1.0e-9
+
+    code
 
     igOpenGL3Shutdown()
     igGlfwShutdown()
