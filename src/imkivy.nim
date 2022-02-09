@@ -128,17 +128,13 @@ template Separator*() = igSeparator()
 template LabelText*(label, text: string) =
   igLabelText(label.cstring, text.cstring)
 
-{.push discardable .}
-
-template Combo*(label: string, itemCurrent: var int32, items: openArray[string]): bool =
+proc Combo*(label: string, itemCurrent: var int32, items: openArray[string]): bool {.discardable.} =
   var vals: seq[cstring] = newSeqOfCap[cstring](items.len())
   for item in items:
     vals.add item.cstring
   mkUniqueIdRet: igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
 
-{.pop.}
-
-template Input*(label: string, text: var string, size: int = -1): bool =
+proc Input*(label: string, text: var string, size: static[int] = -1): bool {.discardable.} =
   var ln: uint
   when size > 0:
     ln = size.uint
@@ -147,32 +143,32 @@ template Input*(label: string, text: var string, size: int = -1): bool =
   text.setLen(ln)
   mkUniqueIdRet: igInputText(label.cstring, text.cstring, ln)
 
-template Input*(label: string, val: var array[2, int32], flags = 0.ImGuiInputTextFlags): bool =
+proc Input*(label: string, val: var array[2, int32], flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
   mkUniqueIdRet: igInputInt2(label.cstring, val, flags)
-template Input*(label: string, val: var array[3, int32], flags = 0.ImGuiInputTextFlags): bool =
+proc Input*(label: string, val: var array[3, int32], flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
   mkUniqueIdRet: igInputInt3(label.cstring, val, flags)
-template Input*(label: string, val: var array[4, int32], flags = 0.ImGuiInputTextFlags): bool =
+proc Input*(label: string, val: var array[4, int32], flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
   mkUniqueIdRet: igInputInt4(label.cstring, val, flags)
-template Input*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool =
+proc Input*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
   mkUniqueIdRet: igInputInt(label.cstring, val.addr, step, step_fast, flags)
 
-template Input*(label: string, val: var array[2, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputFloat2(label.cstring, val, format, flags)
-template Input*(label: string, val: var array[3, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputFloat3(label.cstring, val, format, flags)
-template Input*(label: string, val: var array[4, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputFloat4(label.cstring, val, format, flags)
-template Input*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f32, format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
+proc Input*(label: string, val: var array[2, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
+  mkUniqueIdRet: igInputFloat2(label.cstring, val, format, flags)
+proc Input*(label: string, val: var array[3, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
+  mkUniqueIdRet: igInputFloat3(label.cstring, val, format, flags)
+proc Input*(label: string, val: var array[4, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
+  mkUniqueIdRet: igInputFloat4(label.cstring, val, format, flags)
+proc Input*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f32, format = "%.3f", flags = 0.ImGuiInputTextFlags): bool {.discardable.} =
+  mkUniqueIdRet: igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
 
-template DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f32..0'f32 , format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
+proc DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f32..0'f32 , format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igDragFloat(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
-template DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
+proc DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 
-template SliderInput*(label: string, val: var int32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
+proc SliderInput*(label: string, val: var int32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
-template SliderInput*(label: string, val: var float32, rng = 0'f32..0'f32, format = "%.3f", log = false, flags = 0.ImGuiSliderFlags): bool =
+proc SliderInput*(label: string, val: var float32, rng = 0'f32..0'f32, format = "%.3f", log = false, flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igSliderFloat(label.cstring, val.addr, rng.a, rng.b, format, flags)
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
