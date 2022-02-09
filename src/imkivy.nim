@@ -158,6 +158,9 @@ template DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f
 template DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
   igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 
+template SliderInput*(label: string, val: var int32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
+  igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
+
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
 template PlotDataLines*(
