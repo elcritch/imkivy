@@ -118,10 +118,19 @@ widget WidgetsBasic:
     ShowOnItemIsHovered:
       SetTooltip("list box item: " & listItems[self.listindex])
 
+widget WidgetsPlots:
+  object:
+    animate: bool
+
+  # Simple window
+  CollapsingHeader("Plots"):
+    Checkbox("Animate", self.animate)
+
 ImKivyMain():
 
   var show_demo: bool = true
   var bdData = WidgetsBasicData()
+  var plData = WidgetsPlotsData()
 
   ImKivyLoop:
     if show_demo:
@@ -139,6 +148,6 @@ ImKivyMain():
 
     Window("Widgets"):
       WidgetsBasic(bdData)
-      # WidgetsPlots(plData)
+      WidgetsPlots(plData)
 
 run()
