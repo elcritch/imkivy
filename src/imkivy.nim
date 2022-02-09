@@ -126,7 +126,7 @@ template Combo*(label: string, itemCurrent: var int32, items: openArray[string])
     vals.add item.cstring
   igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
 
-template InputText*(label: string, text: var string, size: int = -1) =
+template Input*(label: string, text: var string, size: int = -1) =
   var ln: uint
   when size > 0:
     ln = size.uint
@@ -135,23 +135,28 @@ template InputText*(label: string, text: var string, size: int = -1) =
   text.setLen(ln)
   igInputText(label.cstring, text.cstring, ln)
 
-template InputInt*(label: string, val: var array[2, int32], flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var array[2, int32], flags = 0.ImGuiInputTextFlags): bool =
   igInputInt2(label.cstring, val, flags)
-template InputInt*(label: string, val: var array[3, int32], flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var array[3, int32], flags = 0.ImGuiInputTextFlags): bool =
   igInputInt3(label.cstring, val, flags)
-template InputInt*(label: string, val: var array[4, int32], flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var array[4, int32], flags = 0.ImGuiInputTextFlags): bool =
   igInputInt4(label.cstring, val, flags)
-template InputInt*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool =
   igInputInt(label.cstring, val.addr, step, step_fast, flags)
 
-template InputFloat*(label: string, val: var array[2, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var array[2, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
   igInputFloat2(label.cstring, val, format, flags)
-template InputFloat*(label: string, val: var array[3, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var array[3, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
   igInputFloat3(label.cstring, val, format, flags)
-template InputFloat*(label: string, val: var array[4, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var array[4, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
   igInputFloat4(label.cstring, val, format, flags)
-template InputFloat*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f32, format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+template Input*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f32, format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
   igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
+
+template DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f32..0'f32 , format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
+  igDragFloat(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
+template DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
+  igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 

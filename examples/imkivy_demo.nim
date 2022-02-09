@@ -23,6 +23,8 @@ widget WidgetsBasic:
     inputInt3: array[3, int32]
     inputFloat: float32
     inputFloat4: array[4, float32]
+    dragInt: int32
+    dragFlt: float32
 
   # Simple window
   Window("Widgets"):
@@ -84,11 +86,13 @@ widget WidgetsBasic:
       let items = ["AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK"]
       Combo("combo", self.itemCurrent, items)
 
-      InputText("input text", self.str0, 5)
-      InputInt("input int", self.inputInt)
-      InputInt("input int", self.inputInt3)
-      InputFloat("input float", self.inputFloat)
-      InputFloat("input float4", self.inputFloat4)
+      Input("input text", self.str0, 5)
+      Input("input int", self.inputInt)
+      Input("input int", self.inputInt3)
+      Input("input float", self.inputFloat)
+      Input("input float4", self.inputFloat4)
+      DragInput("drag int", self.dragInt, rng = -100'i32..100'i32)
+      DragInput("drag float", self.dragFlt, rng = -100'f32..100'f32)
       # PlotDataLines("Frame Times", arr)
       # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
