@@ -26,6 +26,8 @@ widget WidgetsBasic:
     dragInt: int32
     dragFlt: float32
     sliderInt: int32
+    sliderFloat: float32
+    sliderFloat2: float32
 
   # Simple window
   Window("Widgets"):
@@ -95,6 +97,8 @@ widget WidgetsBasic:
       DragInput("drag int", self.dragInt, rng = -100'i32..100'i32)
       DragInput("drag float", self.dragFlt, rng = -100'f32..100'f32)
       SliderInput("slider int", self.sliderInt, rng = -100'i32..100'i32)
+      SliderInput("slider float", self.sliderFloat, rng = -100'f32..100'f32)
+      SliderInput("slider float log", self.sliderFloat2, rng = -100'f32..100'f32, flags=Logarithmic)
       # PlotDataLines("Frame Times", arr)
       # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 

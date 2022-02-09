@@ -43,10 +43,21 @@ macro mkUniqueId*(line: untyped): untyped =
   ItemIds.inc()
   var itemid = ItemIds.int32 
   result = newStmtList()
-  result = quote do:
-    igPushID(`itemid`)
-    `line`
-    igPopId()
+  try:
+    let ret = line.last().getType()
+    echo "RET:", repr ret
+    echo "RET:" 
+    result = quote do:
+      igPushID(`itemid`)
+      var res = `line`
+      igPopId()
+      res
+  except Exception as err:
+    echo("ERR: ", err.msg)
+    result = quote do:
+      igPushID(`itemid`)
+      `line`
+      igPopId()
   echo "mkUniqueId: ", result.repr
 
 template WidgetUniqueId*(blk: untyped) = mkUniqueId(blk)
@@ -120,46 +131,48 @@ template Separator*() = igSeparator()
 template LabelText*(label, text: string) =
   igLabelText(label.cstring, text.cstring)
 
-template Combo*(label: string, itemCurrent: var int32, items: openArray[string]) =
+template Combo*(label: string, itemCurrent: var int32, items: openArray[string]): bool =
   var vals: seq[cstring] = newSeqOfCap[cstring](items.len())
   for item in items:
     vals.add item.cstring
-  igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
+  mkUniqueId: igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
 
-template Input*(label: string, text: var string, size: int = -1) =
+template Input*(label: string, text: var string, size: int = -1): bool =
   var ln: uint
   when size > 0:
     ln = size.uint
   else:
     ln = text.len().uint
   text.setLen(ln)
-  igInputText(label.cstring, text.cstring, ln)
+  mkUniqueId: igInputText(label.cstring, text.cstring, ln)
 
 template Input*(label: string, val: var array[2, int32], flags = 0.ImGuiInputTextFlags): bool =
-  igInputInt2(label.cstring, val, flags)
+  mkUniqueId: igInputInt2(label.cstring, val, flags)
 template Input*(label: string, val: var array[3, int32], flags = 0.ImGuiInputTextFlags): bool =
-  igInputInt3(label.cstring, val, flags)
+  mkUniqueId: igInputInt3(label.cstring, val, flags)
 template Input*(label: string, val: var array[4, int32], flags = 0.ImGuiInputTextFlags): bool =
-  igInputInt4(label.cstring, val, flags)
+  mkUniqueId: igInputInt4(label.cstring, val, flags)
 template Input*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool =
-  igInputInt(label.cstring, val.addr, step, step_fast, flags)
+  mkUniqueId: igInputInt(label.cstring, val.addr, step, step_fast, flags)
 
 template Input*(label: string, val: var array[2, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  igInputFloat2(label.cstring, val, format, flags)
+  mkUniqueId: igInputFloat2(label.cstring, val, format, flags)
 template Input*(label: string, val: var array[3, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  igInputFloat3(label.cstring, val, format, flags)
+  mkUniqueId: igInputFloat3(label.cstring, val, format, flags)
 template Input*(label: string, val: var array[4, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  igInputFloat4(label.cstring, val, format, flags)
+  mkUniqueId: igInputFloat4(label.cstring, val, format, flags)
 template Input*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f32, format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
-  igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
+  mkUniqueId: igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
 
 template DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f32..0'f32 , format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
-  igDragFloat(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
+  mkUniqueId: igDragFloat(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 template DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
-  igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
+  mkUniqueId: igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 
 template SliderInput*(label: string, val: var int32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool =
-  igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
+  mkUniqueId: igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
+template SliderInput*(label: string, val: var float32, rng = 0'f32..0'f32, format = "%.3f", log = false, flags = 0.ImGuiSliderFlags): bool =
+  mkUniqueId: igSliderFloat(label.cstring, val.addr, rng.a, rng.b, format, flags)
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
