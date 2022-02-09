@@ -42,23 +42,20 @@ var
 macro mkUniqueId*(line: untyped): untyped =
   ItemIds.inc()
   var itemid = ItemIds.int32 
-  result = newStmtList()
-  try:
-    let ret = line.last().getType()
-    echo "RET:", repr ret
-    echo "RET:" 
-    result = quote do:
-      igPushID(`itemid`)
-      var res = `line`
-      igPopId()
-      res
-  except Exception as err:
-    echo("ERR: ", err.msg)
-    result = quote do:
-      igPushID(`itemid`)
-      `line`
-      igPopId()
-  echo "mkUniqueId: ", result.repr
+  result = quote do:
+    igPushID(`itemid`)
+    `line`
+    igPopId()
+
+macro mkUniqueIdRet*(line: untyped): untyped =
+  ItemIds.inc()
+  var itemid = ItemIds.int32 
+  result = quote do:
+    igPushID(`itemid`)
+    var res = `line`
+    igPopId()
+    res
+
 
 template WidgetUniqueId*(blk: untyped) = mkUniqueId(blk)
 
@@ -131,11 +128,15 @@ template Separator*() = igSeparator()
 template LabelText*(label, text: string) =
   igLabelText(label.cstring, text.cstring)
 
+{.push discardable .}
+
 template Combo*(label: string, itemCurrent: var int32, items: openArray[string]): bool =
   var vals: seq[cstring] = newSeqOfCap[cstring](items.len())
   for item in items:
     vals.add item.cstring
-  mkUniqueId: igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
+  mkUniqueIdRet: igCombo(label.cstring, itemCurrent.addr, vals[0].addr, items.len().int32)
+
+{.pop.}
 
 template Input*(label: string, text: var string, size: int = -1): bool =
   var ln: uint
@@ -144,16 +145,16 @@ template Input*(label: string, text: var string, size: int = -1): bool =
   else:
     ln = text.len().uint
   text.setLen(ln)
-  mkUniqueId: igInputText(label.cstring, text.cstring, ln)
+  mkUniqueIdRet: igInputText(label.cstring, text.cstring, ln)
 
 template Input*(label: string, val: var array[2, int32], flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputInt2(label.cstring, val, flags)
+  mkUniqueIdRet: igInputInt2(label.cstring, val, flags)
 template Input*(label: string, val: var array[3, int32], flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputInt3(label.cstring, val, flags)
+  mkUniqueIdRet: igInputInt3(label.cstring, val, flags)
 template Input*(label: string, val: var array[4, int32], flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputInt4(label.cstring, val, flags)
+  mkUniqueIdRet: igInputInt4(label.cstring, val, flags)
 template Input*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool =
-  mkUniqueId: igInputInt(label.cstring, val.addr, step, step_fast, flags)
+  mkUniqueIdRet: igInputInt(label.cstring, val.addr, step, step_fast, flags)
 
 template Input*(label: string, val: var array[2, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
   mkUniqueId: igInputFloat2(label.cstring, val, format, flags)
