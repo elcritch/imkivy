@@ -34,7 +34,7 @@ widget WidgetsBasic:
     sliderFloat2: float32
     sliderFloat3: float32
     sliderElement: Element
-    listIdx: int32
+    listIndex: int32
 
   # Simple window
   Window("Widgets"):
@@ -115,9 +115,9 @@ widget WidgetsBasic:
       # const char* elem_name = (elem >= 0 && elem < Element_COUNT) ? elems_names[elem] : "Unknown";
       SliderInput("slider enum", self.sliderElement)
       let listItems = ["Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon"]
-      ListBox("listbox", self.listIdx, listItems)
+      ListBox("listbox", self.listIndex, listItems)
       ShowOnItemIsHovered:
-        SetTooltip("list box item: " & listItems[self.listIdx])
+        SetTooltip("list box item: " & listItems[self.listindex])
 
 ImKivyMain():
 

@@ -182,12 +182,7 @@ proc getter(data: pointer, idx: int32, outText: ptr cstring): bool {.cdecl.} =
   outText[] = items[][idx].cstring
   result = true
 proc ListBox*(label: string, current_item: var int32, items: openArray[string], height_in_items = -1'i32): bool {.discardable.} =
-  igListBox(label.cstring,
-            current_item.addr,
-            getter,
-            items.addr.pointer,
-            items.len().int32,
-            height_in_items)
+  igListBox(label.cstring, current_item.addr, getter, items.addr.pointer, items.len().int32, height_in_items)
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
