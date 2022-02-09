@@ -10,6 +10,10 @@ import example_window
 
 import std/os, std/times, std/monotimes
 
+type
+  Element* = enum
+    Fire, Earth, Air, Water
+
 widget WidgetsBasic:
   object:
     counter: uint
@@ -29,6 +33,8 @@ widget WidgetsBasic:
     sliderFloat: float32
     sliderFloat2: float32
     sliderFloat3: float32
+    sliderElement: Element
+    listIdx: int32
 
   # Simple window
   Window("Widgets"):
@@ -95,6 +101,7 @@ widget WidgetsBasic:
       Input("input int", self.inputInt3)
       Input("input float", self.inputFloat)
       Input("input float4", self.inputFloat4)
+      Input("input scientific:", self.inputFloat, step=0.1'f32, format = "%e")
       DragInput("drag int", self.dragInt, rng = -100'i32..100'i32)
       DragInput("drag float", self.dragFlt, rng = -100'f32..100'f32)
       SliderInput("slider int", self.sliderInt, rng = -100'i32..100'i32)
@@ -103,6 +110,14 @@ widget WidgetsBasic:
       SliderAngle("slider float deg", self.sliderFloat3)
       # PlotDataLines("Frame Times", arr)
       # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
+
+      # const char* elems_names[Element_COUNT] = { "Fire", "Earth", "Air", "Water" };
+      # const char* elem_name = (elem >= 0 && elem < Element_COUNT) ? elems_names[elem] : "Unknown";
+      SliderInput("slider enum", self.sliderElement)
+      let listItems = ["Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon"]
+      ListBox("listbox", self.listIdx, listItems)
+      ShowOnItemIsHovered:
+        SetTooltip("list box item: " & listItems[self.listIdx])
 
 ImKivyMain():
 

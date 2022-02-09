@@ -1,6 +1,8 @@
 import macros
 import sugar
 import strutils
+import std/typetraits
+
 
 import imgui, imgui/[impl_opengl, impl_glfw]
 import nimgl/[opengl, glfw]
@@ -166,6 +168,8 @@ proc DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f32..
 proc DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 
+proc SliderInput*[T: enum](label: string, val: var T): bool {.discardable.} =
+  mkUniqueId: igSliderInt(label.cstring, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
 proc SliderInput*(label: string, val: var int32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
 proc SliderInput*(label: string, val: var float32, rng = 0'f32..0'f32, format = "%.3f", log = false, flags = 0.ImGuiSliderFlags): bool {.discardable.} =
@@ -173,7 +177,17 @@ proc SliderInput*(label: string, val: var float32, rng = 0'f32..0'f32, format = 
 proc SliderAngle*(label: string, val: var float32, rng = -360'f32..360'f32, format = "%.3f deg", log = false, flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igSliderAngle(label.cstring, val.addr, rng.a, rng.b, format, flags)
 
-  # proc igSliderAngle*(label: cstring, v_rad: ptr float32, v_degrees_min: float32 = -360.0f, v_degrees_max: float32 = +360.0f, format: cstring = "%.0f deg", flags: ImGuiSliderFlags = 0.ImGuiSliderFlags): bool {.importc: "igSliderAngle".}
+proc getter(data: pointer, idx: int32, outText: ptr cstring): bool {.cdecl.} =
+  var items = cast[ptr UncheckedArray[string]](data)
+  outText[] = items[][idx].cstring
+  result = true
+proc ListBox*(label: string, current_item: var int32, items: openArray[string], height_in_items = -1'i32): bool {.discardable.} =
+  igListBox(label.cstring,
+            current_item.addr,
+            getter,
+            items.addr.pointer,
+            items.len().int32,
+            height_in_items)
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
