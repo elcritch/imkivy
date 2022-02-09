@@ -20,7 +20,9 @@ widget WidgetsBasic:
     itemCurrent: int32
     str0: string
     inputInt: int32
+    inputInt3: array[3, int32]
     inputFloat: float32
+    inputFloat4: array[4, float32]
 
   # Simple window
   Window("Widgets"):
@@ -84,7 +86,9 @@ widget WidgetsBasic:
 
       InputText("input text", self.str0, 5)
       InputInt("input int", self.inputInt)
+      InputInt("input int", self.inputInt3)
       InputFloat("input float", self.inputFloat)
+      InputFloat("input float4", self.inputFloat4)
       # PlotDataLines("Frame Times", arr)
       # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 

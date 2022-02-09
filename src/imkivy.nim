@@ -135,9 +135,21 @@ template InputText*(label: string, text: var string, size: int = -1) =
   text.setLen(ln)
   igInputText(label.cstring, text.cstring, ln)
 
+template InputInt*(label: string, val: var array[2, int32], flags = 0.ImGuiInputTextFlags): bool =
+  igInputInt2(label.cstring, val, flags)
+template InputInt*(label: string, val: var array[3, int32], flags = 0.ImGuiInputTextFlags): bool =
+  igInputInt3(label.cstring, val, flags)
+template InputInt*(label: string, val: var array[4, int32], flags = 0.ImGuiInputTextFlags): bool =
+  igInputInt4(label.cstring, val, flags)
 template InputInt*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool =
   igInputInt(label.cstring, val.addr, step, step_fast, flags)
 
+template InputFloat*(label: string, val: var array[2, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+  igInputFloat2(label.cstring, val, format, flags)
+template InputFloat*(label: string, val: var array[3, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+  igInputFloat3(label.cstring, val, format, flags)
+template InputFloat*(label: string, val: var array[4, float32], format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+  igInputFloat4(label.cstring, val, format, flags)
 template InputFloat*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f32, format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
   igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
 
@@ -247,11 +259,11 @@ macro widget*(class: untyped, blk: untyped) =
   
   var elems = newSeq[NimNode]()
   for field in objectFields:
-    var name = field[0].repr
-    var kind = field[1][0].repr
+    var name = field[0]
+    var kind = field[1][0]
     elems.add nnkIdentDefs.newTree(
-      newIdentNode(name),
-      newIdentNode(kind),
+      name,
+      kind,
       newEmptyNode()
     )
   # Change up the `RecList` child
