@@ -19,6 +19,8 @@ widget WidgetsBasic:
     rptCounter: int32
     itemCurrent: int32
     str0: string
+    inputInt: int32
+    inputFloat: float32
 
   # Simple window
   Window("Widgets"):
@@ -81,6 +83,8 @@ widget WidgetsBasic:
       Combo("combo", self.itemCurrent, items)
 
       InputText("input text", self.str0, 5)
+      InputInt("input int", self.inputInt)
+      InputFloat("input float", self.inputFloat)
       # PlotDataLines("Frame Times", arr)
       # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 

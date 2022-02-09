@@ -135,6 +135,12 @@ template InputText*(label: string, text: var string, size: int = -1) =
   text.setLen(ln)
   igInputText(label.cstring, text.cstring, ln)
 
+template InputInt*(label: string, val: var int32, step = 1'i32, step_fast = 100'i32, flags = 0.ImGuiInputTextFlags): bool =
+  igInputInt(label.cstring, val.addr, step, step_fast, flags)
+
+template InputFloat*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f32, format = "%.3f", flags = 0.ImGuiInputTextFlags): bool =
+  igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
+
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
 template PlotDataLines*(
