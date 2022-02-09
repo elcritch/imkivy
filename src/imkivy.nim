@@ -186,7 +186,7 @@ proc ListBox*(label: string, current_item: var int32, items: openArray[string], 
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
-template PlotDataLines*(
+proc PlotDataLines*(
             label: string,
             data: openArray[float32],
             overlay_text: string = "",
@@ -198,8 +198,7 @@ template PlotDataLines*(
     label.cstring, data[0].unsafeAddr(), data.len().int32,
     0'i32, overlay_text, scale_min, scale_max, graph_size,
     stride = sizeof(float32).int32)
-
-template PlotDataLines*[T](
+proc PlotDataLines*[T](
             label: string,
             dataProc: proc (data: ptr T, idx: int32): float32 {.cdecl.},
             data: T,
@@ -210,6 +209,37 @@ template PlotDataLines*[T](
             graph_size: ImVec2 = ImVec2(x: 0, y: 0)
           ) =
   igPlotLines(
+    label.cstring,
+    dataProc,
+    data.unsafeAddr(),
+    count,
+    0'i32, overlay_text,
+    scale_min, scale_max, graph_size,
+    stride = sizeof(float32).int32)
+
+proc PlotDataHistogram*(
+            label: string,
+            data: openArray[float32],
+            overlay_text: string = "",
+            scale_min: float32 = FLT_MAX,
+            scale_max: float32 = FLT_MAX,
+            graph_size: ImVec2 = ImVec2(x: 0, y: 0)
+          ) =
+  igPlotHistogram(
+    label.cstring, data[0].unsafeAddr(), data.len().int32,
+    0'i32, overlay_text, scale_min, scale_max, graph_size,
+    stride = sizeof(float32).int32)
+proc PlotDataHistogram*[T](
+            label: string,
+            dataProc: proc (data: ptr T, idx: int32): float32 {.cdecl.},
+            data: T,
+            count: int32,
+            overlay_text: string = "",
+            scale_min: float32 = FLT_MAX,
+            scale_max: float32 = FLT_MAX,
+            graph_size: ImVec2 = ImVec2(x: 0, y: 0)
+          ) =
+  igPlotHistogram(
     label.cstring,
     dataProc,
     data.unsafeAddr(),

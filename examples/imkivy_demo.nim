@@ -126,6 +126,10 @@ widget WidgetsPlots:
   CollapsingHeader("Plots"):
     Checkbox("Animate", self.animate)
 
+    let arr = [0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f]
+    PlotDataLines("Frame Times", arr)
+    PlotDataHistogram("Histogram", arr)
+
 ImKivyMain():
 
   var show_demo: bool = true
