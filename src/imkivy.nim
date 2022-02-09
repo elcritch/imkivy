@@ -170,6 +170,10 @@ proc SliderInput*(label: string, val: var int32, rng = 0'i32..0'i32, format = "%
   mkUniqueId: igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
 proc SliderInput*(label: string, val: var float32, rng = 0'f32..0'f32, format = "%.3f", log = false, flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igSliderFloat(label.cstring, val.addr, rng.a, rng.b, format, flags)
+proc SliderAngle*(label: string, val: var float32, rng = -360'f32..360'f32, format = "%.3f deg", log = false, flags = 0.ImGuiSliderFlags): bool {.discardable.} =
+  mkUniqueId: igSliderAngle(label.cstring, val.addr, rng.a, rng.b, format, flags)
+
+  # proc igSliderAngle*(label: cstring, v_rad: ptr float32, v_degrees_min: float32 = -360.0f, v_degrees_max: float32 = +360.0f, format: cstring = "%.0f deg", flags: ImGuiSliderFlags = 0.ImGuiSliderFlags): bool {.importc: "igSliderAngle".}
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
