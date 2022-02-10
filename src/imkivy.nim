@@ -59,9 +59,8 @@ proc ImColorHSV*(h: float32, s: float32, v: float32, a: float32 = 1.0f): ImVec4 
   return res.value
 
 var
-  ItemIds {.compileTime.} = 0
+  ItemIds {.compileTime.} = 100_000
   HorizontalMode {.compileTime.} = false
-
 
 macro mkUniqueId*(line: untyped): untyped =
   ItemIds.inc()
@@ -80,8 +79,13 @@ macro mkUniqueIdRet*(line: untyped): untyped =
     igPopId()
     res
 
+template WidgetUniqueId*(id: int, blk: untyped) =
+  igPushID(id.int32)
+  `blk`
+  igPopId()
 
-template WidgetUniqueId*(blk: untyped) = mkUniqueId(blk)
+template PushID*(id: int) = igPushID(id.int32)
+template PopID*() = igPopId()
 
 macro mkButton(label: string, btn, blk: untyped) =
   var
@@ -186,9 +190,9 @@ proc Input*(label: string, val: var float32, step = 1.0'f32, step_fast = 10.0'f3
   mkUniqueIdRet: igInputFloat(label.cstring, val.addr, step, step_fast, format, flags)
 
 proc DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f32..0'f32 , format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
-  mkUniqueId: igDragFloat(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
+  mkUniqueIdRet: igDragFloat(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 proc DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
-  mkUniqueId: igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
+  mkUniqueIdRet: igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 
 type
   Dirs* = enum Horiz, Vert
@@ -206,9 +210,9 @@ proc Slider*[T: enum](label: string, val: var T;
   mkUniqueId:
     case orient.dir:
     of Horiz:
-      igSliderInt(label.cstring, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
+      result = igSliderInt(label.cstring, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
     of Vert:
-      igVSliderInt(label.cstring, orient.size, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
+      result = igVSliderInt(label.cstring, orient.size, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
 
 proc Slider*(label: string, val: var int32, rng = 0'i32..0'i32;
              format = "%.3f",
@@ -217,9 +221,9 @@ proc Slider*(label: string, val: var int32, rng = 0'i32..0'i32;
   mkUniqueId:
     case orient.dir:
     of Horiz:
-      igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
+      result = igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
     of Vert:
-      igVSliderInt(label.cstring, orient.size, val.addr, rng.a, rng.b, format, flags)
+      result = igVSliderInt(label.cstring, orient.size, val.addr, rng.a, rng.b, format, flags)
 
 proc Slider*(label: string, val: var float32, rng = 0'f32..0'f32;
              format = "%.3f",
@@ -229,16 +233,17 @@ proc Slider*(label: string, val: var float32, rng = 0'f32..0'f32;
   mkUniqueId:
     case orient.dir:
     of Horiz:
-      igSliderFloat(label.cstring, val.addr, rng.a, rng.b, format, flags)
+      result = igSliderFloat(label.cstring, val.addr, rng.a, rng.b, format, flags)
     of Vert:
-      igVSliderFloat(label.cstring, orient.size, val.addr, rng.a, rng.b, format, flags)
+      result = igVSliderFloat(label.cstring, orient.size, val.addr, rng.a, rng.b, format, flags)
 
 proc getter(data: pointer, idx: int32, outText: ptr cstring): bool {.cdecl.} =
   var items = cast[ptr UncheckedArray[string]](data)
   outText[] = items[][idx].cstring
   result = true
 proc ListBox*(label: string, current_item: var int32, items: openArray[string], height_in_items = -1'i32): bool {.discardable.} =
-  igListBox(label.cstring, current_item.addr, getter, items.addr.pointer, items.len().int32, height_in_items)
+  mkUniqueIdRet:
+    igListBox(label.cstring, current_item.addr, getter, items.addr.pointer, items.len().int32, height_in_items)
 
 var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 
@@ -323,7 +328,7 @@ macro ShowOnItemIsHovered*(blk: untyped) =
     if igIsItemHovered():
       `blk`
 
-template SetToolTip*(label: string) =
+proc SetToolTip*(label: string) {.varargs.} =
   igSetTooltip(label.cstring)
 
 macro RadioButtons*(variable: int32, horiz: static[bool] = true, values: untyped) =

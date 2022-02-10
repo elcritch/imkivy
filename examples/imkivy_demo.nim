@@ -58,11 +58,12 @@ widget WidgetsBasic:
     for i in 0..<7:
       let fi = i.toFloat()
       if i > 0: SameLine()
-      WidgetUniqueId():
+      WidgetUniqueId(i):
         PushStyleColor(ImGuiCol.Button, ImColorHSV(fi / 7.0f, 0.6f, 0.6f))
         PushStyleColor(ImGuiCol.ButtonHovered, ImColorHSV(fi / 7.0f, 0.7f, 0.7f))
         PushStyleColor(ImGuiCol.ButtonActive, ImColorHSV(fi / 7.0f, 0.8f, 0.8f))
-        Button("Click")
+        if Button("Click"):
+          echo "Click: ", i
         PopStyleColor(3)
 
     igAlignTextToFramePadding()
@@ -161,25 +162,51 @@ widget WidgetsPlots:
     for n in 0..<len(self.values): average += self.values[n]
     average /= len(self.values).toFloat()
     var overlay = "avg " & $average
-    PlotDataLines("Lines", self.values, self.values_offset, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 80.0'f32))
-    PlotDataLines("Lines2", self.values2, self.values_offset2, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
-    PlotDataLines("Lines3", self.values3, self.values_offset2, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
+    PlotDataLines("Lines", self.values, self.values_offset,
+                  overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 80.0'f32))
+    PlotDataLines("Lines2", self.values2, self.values_offset2,
+                  overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
+    PlotDataLines("Lines3", self.values3, self.values_offset2,
+                  overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
 
 widget WidgetsOther:
   object:
     intVal: int32
+    values: array[7, float32]
 
   CollapsingHeader("Vertical Sliders"):
     let spacing = 4.0'f32
     withStyle(ItemSpacing, ImVec2(x: spacing, y: spacing)):
-      Slider("##int", self.intVal, rng = 0'i32..5'i32, orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
+      Slider("##int", self.intVal, rng = 0'i32..5'i32,
+            orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
+      SameLine()
+      for idx in 0..<self.values.len():
+        WidgetUniqueId(idx):
+          let tf = idx.toFloat()
+          PushStyleColor(FrameBg, ImColorHSV(tf / 7.0, 0.5, 0.5))
+          PushStyleColor(FrameBgHovered, ImColorHSV(tf / 7.0f, 0.6f, 0.5f))
+          PushStyleColor(FrameBgActive, ImColorHSV(tf / 7.0f, 0.7f, 0.5f))
+          PushStyleColor(SliderGrab, ImColorHSV(tf / 7.0f, 0.9f, 0.9f))
+          Slider("##v", self.values[idx], rng = 0.0'f32..1.0'f32,
+                orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
+          ShowOnItemIsHovered:
+            SetTooltip("%.3f", self.values[idx])
+          PopStyleColor(4)
+          SameLine()
+      
+      # Debug button
+      Button("Button"):
+        size: (50, 20)
+        on_press: 
+          echo "vertial sliders: ", repr(self.values)
 
 ImKivyMain():
 
   var show_demo: bool = true
   var bdData = WidgetsBasicData()
   var plData = WidgetsPlotsData(animate: true)
-  var woData = WidgetsOtherData()
+  let values: array[7, float32] = [0.0'f32, 0.60, 0.35, 0.9, 0.70, 0.20, 0.0]
+  var woData = WidgetsOtherData(values: values)
 
   ImKivyLoop:
     if show_demo:
