@@ -328,8 +328,9 @@ macro ShowOnItemIsHovered*(blk: untyped) =
     if igIsItemHovered():
       `blk`
 
-proc SetToolTip*(label: string) {.varargs.} =
-  igSetTooltip(label.cstring)
+template SetToolTip*(args: varargs[untyped]) =
+  unpackVarargs(igSetTooltip, args)
+
 
 macro RadioButtons*(variable: int32, horiz: static[bool] = true, values: untyped) =
   var res = newStmtList()
