@@ -28,8 +28,30 @@ template Slider*(label: string, val: var float, min = 0.0, max = 1.0) =
   igSliderFloat(label, val.addr, min, max)
 
 template SameLine*() = igSameLine()
-template PushStyleColor*(idx: ImGuiCol, col: ImVec4) = igPushStyleColor(idx, col)
-template PopStyleColor*(count: int32) = igPopStyleColor(count)
+
+proc PushStyleColor*(idx: ImGuiCol, col: ImVec4) =
+  igPushStyleColor(idx, col)
+proc PopStyleColor*(count: int32) =
+  igPopStyleColor(count)
+template withStyleColor*(idx: ImGuiCol, col: ImVec4, blk: untyped) =
+  igPushStyleColor(idx, col)
+  blk
+  igPopStyleColor(1)
+
+proc PushStyle*(idx: static[ImGuiStyleVar], col: float32 | ImVec2) =
+  for name, field in igGetStyle()[].fieldPairs():
+    when name.toLowerAscii() == toLowerAscii($idx):
+      static:
+        assert field is type(col)
+  igPushStyleVar(idx, col)
+proc PushStyle*(idx: ImGuiStyleVar, col: ImVec2) =
+  igPushStyleVar(idx, col)
+proc PopStyle*(count: int32) =
+  igPopStyleVar(count)
+template withStyle*(idx: ImGuiStyleVar, val: ImVec2 | float32, blk: untyped) =
+  igPushStyleVar(idx, val)
+  blk
+  igPopStyleVar(1)
 
 proc ImColorHSV*(h: float32, s: float32, v: float32, a: float32 = 1.0f): ImVec4 =
   var res: ImColor 
@@ -168,14 +190,48 @@ proc DragInput*(label: string, val: var float32, vspeed = 0.1'f32, rng = 0'f32..
 proc DragInput*(label: string, val: var int32, vspeed = 1.0'f32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId: igDragInt(label.cstring, val.addr, vspeed, rng.a, rng.b, format, flags)
 
-proc SliderInput*[T: enum](label: string, val: var T): bool {.discardable.} =
-  mkUniqueId: igSliderInt(label.cstring, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
-proc SliderInput*(label: string, val: var int32, rng = 0'i32..0'i32, format = "%.3f", flags = 0.ImGuiSliderFlags): bool {.discardable.} =
-  mkUniqueId: igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
-proc SliderInput*(label: string, val: var float32, rng = 0'f32..0'f32, format = "%.3f", log = false, flags = 0.ImGuiSliderFlags): bool {.discardable.} =
-  mkUniqueId: igSliderFloat(label.cstring, val.addr, rng.a, rng.b, format, flags)
-proc SliderAngle*(label: string, val: var float32, rng = -360'f32..360'f32, format = "%.3f deg", log = false, flags = 0.ImGuiSliderFlags): bool {.discardable.} =
-  mkUniqueId: igSliderAngle(label.cstring, val.addr, rng.a, rng.b, format, flags)
+type
+  Dirs* = enum Horiz, Vert
+
+  Orient* = object
+    case dir*: Dirs
+    of Horiz:
+      discard
+    of Vert:
+      size*: ImVec2
+
+proc Slider*[T: enum](label: string, val: var T;
+                      orient: Orient = Orient(dir: Horiz),
+                      ): bool {.discardable.} =
+  mkUniqueId:
+    case orient.dir:
+    of Horiz:
+      igSliderInt(label.cstring, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
+    of Vert:
+      igVSliderInt(label.cstring, orient.size, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
+
+proc Slider*(label: string, val: var int32, rng = 0'i32..0'i32;
+             format = "%.3f",
+             orient: Orient = Orient(dir: Horiz),
+             flags = 0.ImGuiSliderFlags): bool {.discardable.} =
+  mkUniqueId:
+    case orient.dir:
+    of Horiz:
+      igSliderInt(label.cstring, val.addr, rng.a, rng.b, format, flags)
+    of Vert:
+      igVSliderInt(label.cstring, orient.size, val.addr, rng.a, rng.b, format, flags)
+
+proc Slider*(label: string, val: var float32, rng = 0'f32..0'f32;
+             format = "%.3f",
+             orient: Orient = Orient(dir: Horiz),
+             log = false,
+             flags = 0.ImGuiSliderFlags): bool {.discardable.} =
+  mkUniqueId:
+    case orient.dir:
+    of Horiz:
+      igSliderFloat(label.cstring, val.addr, rng.a, rng.b, format, flags)
+    of Vert:
+      igVSliderFloat(label.cstring, orient.size, val.addr, rng.a, rng.b, format, flags)
 
 proc getter(data: pointer, idx: int32, outText: ptr cstring): bool {.cdecl.} =
   var items = cast[ptr UncheckedArray[string]](data)

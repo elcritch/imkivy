@@ -104,16 +104,17 @@ widget WidgetsBasic:
     Input("input scientific:", self.inputFloat, step=0.1'f32, format = "%e")
     DragInput("drag int", self.dragInt, rng = -100'i32..100'i32)
     DragInput("drag float", self.dragFlt, rng = -100'f32..100'f32)
-    SliderInput("slider int", self.sliderInt, rng = -100'i32..100'i32)
-    SliderInput("slider float", self.sliderFloat, rng = -100'f32..100'f32)
-    SliderInput("slider float log", self.sliderFloat2, rng = -100'f32..100'f32, flags=Logarithmic)
-    SliderAngle("slider float deg", self.sliderFloat3)
+    Slider("slider int", self.sliderInt, rng = -100'i32..100'i32)
+    Slider("slider float", self.sliderFloat, rng = -100'f32..100'f32)
+    Slider("slider float log", self.sliderFloat2, rng = -100'f32..100'f32, flags=Logarithmic)
+    Slider("slider float deg", self.sliderFloat3, rng = -360'f32..360'f32, format = "%.3f def")
+
     # PlotDataLines("Frame Times", arr)
     # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
     # const char* elems_names[Element_COUNT] = { "Fire", "Earth", "Air", "Water" };
     # const char* elem_name = (elem >= 0 && elem < Element_COUNT) ? elems_names[elem] : "Unknown";
-    SliderInput("slider enum", self.sliderElement)
+    Slider("slider enum", self.sliderElement)
     let listItems = ["Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon"]
     ListBox("listbox", self.listIndex, listItems)
     ShowOnItemIsHovered:
@@ -164,12 +165,24 @@ widget WidgetsPlots:
     PlotDataLines("Lines2", self.values2, self.values_offset2, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
     PlotDataLines("Lines3", self.values3, self.values_offset2, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
 
+widget WidgetsOther:
+  object:
+    intVal: int32
+
+  CollapsingHeader("Vertical Sliders"):
+    let spacing = 4.0'f32
+    # withStyle(ItemSpacing, spacing):
+      # Slider("##int", self.intVal, rng = 0'i32..5'i32, orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)) )
+    PushStyle(ItemSpacing, ImVec2(x: spacing, y: spacing))
+    Slider("##int", self.intVal, rng = 0'i32..5'i32, orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)) )
+    PopStyle(1)
 
 ImKivyMain():
 
   var show_demo: bool = true
   var bdData = WidgetsBasicData()
   var plData = WidgetsPlotsData(animate: true)
+  var woData = WidgetsOtherData()
 
   ImKivyLoop:
     if show_demo:
@@ -188,5 +201,6 @@ ImKivyMain():
     Window("Widgets"):
       WidgetsBasic(bdData)
       WidgetsPlots(plData)
+      WidgetsOther(woData)
 
 run()
