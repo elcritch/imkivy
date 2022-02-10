@@ -180,25 +180,26 @@ widget WidgetsOther:
       Slider("##int", self.intVal, rng = 0'i32..5'i32,
             orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
       SameLine()
-      for idx in 0..<self.values.len():
-        WidgetUniqueId(idx):
-          let tf = idx.toFloat()
-          PushStyleColor(FrameBg, ImColorHSV(tf / 7.0, 0.5, 0.5))
-          PushStyleColor(FrameBgHovered, ImColorHSV(tf / 7.0f, 0.6f, 0.5f))
-          PushStyleColor(FrameBgActive, ImColorHSV(tf / 7.0f, 0.7f, 0.5f))
-          PushStyleColor(SliderGrab, ImColorHSV(tf / 7.0f, 0.9f, 0.9f))
-          Slider("##v", self.values[idx], rng = 0.0'f32..1.0'f32,
-                orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
-          ShowOnItemIsHovered:
-            SetTooltip("%.3f", self.values[idx])
-          PopStyleColor(4)
-          SameLine()
-      
-      # Debug button
-      Button("Button"):
-        size: (50, 20)
-        on_press: 
-          echo "vertial sliders: ", repr(self.values)
+    # Colored Sliders
+    for idx in 0..<self.values.len():
+      WidgetUniqueId(idx):
+        let tf = idx.toFloat()
+        PushStyleColor(FrameBg, ImColorHSV(tf / 7.0, 0.5, 0.5))
+        PushStyleColor(FrameBgHovered, ImColorHSV(tf / 7.0f, 0.6f, 0.5f))
+        PushStyleColor(FrameBgActive, ImColorHSV(tf / 7.0f, 0.7f, 0.5f))
+        PushStyleColor(SliderGrab, ImColorHSV(tf / 7.0f, 0.9f, 0.9f))
+        Slider("##v", self.values[idx], rng = 0.0'f32..1.0'f32,
+              orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
+        ShowOnItemIsHovered:
+          SetTooltip("%.3f", self.values[idx])
+        PopStyleColor(4)
+        SameLine()
+    
+    # Debug button
+    Button("Button"):
+      size: (50, 20)
+      on_press: 
+        echo "vertial sliders: ", repr(self.values)
 
 ImKivyMain():
 
