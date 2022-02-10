@@ -2,6 +2,7 @@
 
 import imgui, imgui/[impl_opengl, impl_glfw]
 import nimgl/[opengl, glfw]
+import std/math
 
 import imkivy
 import imkivy/window
@@ -121,6 +122,14 @@ widget WidgetsBasic:
 widget WidgetsPlots:
   object:
     animate: bool
+    refresh_time: float32
+    values: array[120, float32]
+    values2: array[200, float32]
+    values3: array[200, float32]
+    values_offset: int32
+    values_offset2: int32
+    phase: float32
+    phase2: float32
 
   # Simple window
   CollapsingHeader("Plots"):
@@ -130,11 +139,37 @@ widget WidgetsPlots:
     PlotDataLines("Frame Times", arr)
     PlotDataHistogram("Histogram", arr)
 
+    #// Fill an array of contiguous float values to plot
+    #// Tip: If your float aren't contiguous but part of a structure, you can pass a pointer to your first float
+    #// and the sizeof() of your structure in the "stride" parameter.
+
+    if not self.animate or self.refresh_time == 0.0'f32:
+      self.refresh_time = igGetTime()
+
+    if self.animate:
+      self.values[self.values_offset] = cos(self.phase)/3.0
+      self.values2[self.values_offset2] = sin(self.phase2)
+      self.values3[self.values_offset2] = 1.0/3.0 * self.values2[self.values_offset2] 
+      self.values_offset = (self.values_offset + 1) mod len(self.values).int32
+      self.values_offset2 = (self.values_offset2 + 1) mod len(self.values2).int32
+      self.phase += 0.10'f32 * self.values_offset.toFloat()
+      self.phase2 += 0.17'f32 * self.values_offset2.toFloat()
+      self.refresh_time += 1.0'f32 / 60.0'f32
+    
+    var average = 0.0
+    for n in 0..<len(self.values): average += self.values[n]
+    average /= len(self.values).toFloat()
+    var overlay = "avg " & $average
+    PlotDataLines("Lines", self.values, self.values_offset, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 80.0'f32))
+    PlotDataLines("Lines2", self.values2, self.values_offset2, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
+    PlotDataLines("Lines3", self.values3, self.values_offset2, overlay, -1.0f, 1.0f, ImVec2(x: 0'f32, y: 120.0'f32))
+
+
 ImKivyMain():
 
   var show_demo: bool = true
   var bdData = WidgetsBasicData()
-  var plData = WidgetsPlotsData()
+  var plData = WidgetsPlotsData(animate: true)
 
   ImKivyLoop:
     if show_demo:

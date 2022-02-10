@@ -189,6 +189,7 @@ var FLT_MAX {.importc: "__FLT_MAX__", header: "<float.h>".}: float32
 proc PlotDataLines*(
             label: string,
             data: openArray[float32],
+            offset: int32 = 0,
             overlay_text: string = "",
             scale_min: float32 = FLT_MAX,
             scale_max: float32 = FLT_MAX,
@@ -196,13 +197,14 @@ proc PlotDataLines*(
           ) =
   igPlotLines(
     label.cstring, data[0].unsafeAddr(), data.len().int32,
-    0'i32, overlay_text, scale_min, scale_max, graph_size,
+    offset, overlay_text, scale_min, scale_max, graph_size,
     stride = sizeof(float32).int32)
 proc PlotDataLines*[T](
             label: string,
             dataProc: proc (data: ptr T, idx: int32): float32 {.cdecl.},
             data: T,
             count: int32,
+            offset: int32 = 0,
             overlay_text: string = "",
             scale_min: float32 = FLT_MAX,
             scale_max: float32 = FLT_MAX,
@@ -213,7 +215,7 @@ proc PlotDataLines*[T](
     dataProc,
     data.unsafeAddr(),
     count,
-    0'i32, overlay_text,
+    offset, overlay_text,
     scale_min, scale_max, graph_size,
     stride = sizeof(float32).int32)
 
@@ -234,6 +236,7 @@ proc PlotDataHistogram*[T](
             dataProc: proc (data: ptr T, idx: int32): float32 {.cdecl.},
             data: T,
             count: int32,
+            offset: int32 = 0,
             overlay_text: string = "",
             scale_min: float32 = FLT_MAX,
             scale_max: float32 = FLT_MAX,
@@ -244,7 +247,7 @@ proc PlotDataHistogram*[T](
     dataProc,
     data.unsafeAddr(),
     count,
-    0'i32, overlay_text,
+    offset, overlay_text,
     scale_min, scale_max, graph_size,
     stride = sizeof(float32).int32)
 
