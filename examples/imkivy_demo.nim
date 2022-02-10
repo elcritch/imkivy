@@ -171,11 +171,8 @@ widget WidgetsOther:
 
   CollapsingHeader("Vertical Sliders"):
     let spacing = 4.0'f32
-    # withStyle(ItemSpacing, spacing):
-      # Slider("##int", self.intVal, rng = 0'i32..5'i32, orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)) )
-    PushStyle(ItemSpacing, ImVec2(x: spacing, y: spacing))
-    Slider("##int", self.intVal, rng = 0'i32..5'i32, orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)) )
-    PopStyle(1)
+    withStyle(ItemSpacing, ImVec2(x: spacing, y: spacing)):
+      Slider("##int", self.intVal, rng = 0'i32..5'i32, orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
 
 ImKivyMain():
 

@@ -48,10 +48,10 @@ proc PushStyle*(idx: ImGuiStyleVar, col: ImVec2) =
   igPushStyleVar(idx, col)
 proc PopStyle*(count: int32) =
   igPopStyleVar(count)
-template withStyle*(idx: ImGuiStyleVar, val: ImVec2 | float32, blk: untyped) =
-  igPushStyleVar(idx, val)
+template withStyle*(idx: untyped, val: untyped, blk: untyped) =
+  PushStyle(idx, val)
   blk
-  igPopStyleVar(1)
+  PopStyle(1)
 
 proc ImColorHSV*(h: float32, s: float32, v: float32, a: float32 = 1.0f): ImVec4 =
   var res: ImColor 
