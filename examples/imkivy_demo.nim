@@ -55,16 +55,12 @@ widget WidgetsBasic:
 
     Text("radio: %d", self.radio2)
 
-    for i in 0..<7:
-      let fi = i.toFloat()
-      if i > 0: SameLine()
-      WidgetUniqueId(i):
-        PushStyleColor(ImGuiCol.Button, ImColorHSV(fi / 7.0f, 0.6f, 0.6f))
-        PushStyleColor(ImGuiCol.ButtonHovered, ImColorHSV(fi / 7.0f, 0.7f, 0.7f))
-        PushStyleColor(ImGuiCol.ButtonActive, ImColorHSV(fi / 7.0f, 0.8f, 0.8f))
-        if Button("Click"):
-          echo "Click: ", i
-        PopStyleColor(3)
+    for clr in PrimaryColors.low..PrimaryColors.high:
+      if clr.ord > 0: SameLine()
+      WidgetUniqueId(clr.ord):
+        withColor(clr):
+          if Button("Click"):
+            echo "Clicked: ", clr
 
     igAlignTextToFramePadding()
 
@@ -181,18 +177,13 @@ widget WidgetsOther:
             orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
       SameLine()
     # Colored Sliders
-    for idx in 0..<self.values.len():
-      WidgetUniqueId(idx):
-        let tf = idx.toFloat()
-        PushStyleColor(FrameBg, ImColorHSV(tf / 7.0, 0.5, 0.5))
-        PushStyleColor(FrameBgHovered, ImColorHSV(tf / 7.0f, 0.6f, 0.5f))
-        PushStyleColor(FrameBgActive, ImColorHSV(tf / 7.0f, 0.7f, 0.5f))
-        PushStyleColor(SliderGrab, ImColorHSV(tf / 7.0f, 0.9f, 0.9f))
-        Slider("##v", self.values[idx], rng = 0.0'f32..1.0'f32,
-              orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
-        ShowOnItemIsHovered:
-          SetTooltip("%.3f", self.values[idx])
-        PopStyleColor(4)
+    for clr in PrimaryColors.low..PrimaryColors.high:
+      WidgetUniqueId(clr.ord()):
+        withColor(clr):
+          Slider("##v", self.values[clr.ord], rng = 0.0'f32..1.0'f32,
+                  orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
+          ShowOnItemIsHovered:
+            SetTooltip("%.3f", self.values[clr.ord])
         SameLine()
     
     # Debug button

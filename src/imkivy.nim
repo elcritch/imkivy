@@ -2,7 +2,9 @@ import macros
 import sugar
 import strutils
 import std/typetraits
+import std/enumutils
 
+export sugar, strutils, enumutils
 
 import imgui, imgui/[impl_opengl, impl_glfw]
 import nimgl/[opengl, glfw]
@@ -409,3 +411,25 @@ template CollapsingHeader*(label: string, blk: untyped): untyped =
 template CollapsingHeader*(label: string, flags: ImGuiTreeNodeFlags, blk: untyped): untyped =
   if igCollapsingHeader(label, flags):
     blk
+
+type
+  PrimaryColors* = enum
+    Red,
+    Yellow,
+    Green,
+    Teal,
+    Blue,
+    Magenta
+
+template withColor*(color: PrimaryColors, blk: untyped): untyped =
+  let tf = color.ord().toFloat()
+  PushStyleColor(FrameBg, ImColorHSV(tf / 7.0, 0.5, 0.5))
+  PushStyleColor(FrameBgHovered, ImColorHSV(tf / 7.0f, 0.6f, 0.5f))
+  PushStyleColor(FrameBgActive, ImColorHSV(tf / 7.0f, 0.7f, 0.5f))
+  PushStyleColor(SliderGrab, ImColorHSV(tf / 7.0f, 0.9f, 0.9f))
+
+  PushStyleColor(ImGuiCol.Button, ImColorHSV(tf / 7.0f, 0.6f, 0.6f))
+  PushStyleColor(ImGuiCol.ButtonHovered, ImColorHSV(tf / 7.0f, 0.7f, 0.7f))
+  PushStyleColor(ImGuiCol.ButtonActive, ImColorHSV(tf / 7.0f, 0.8f, 0.8f))
+  blk
+  PopStyleColor(7)
