@@ -12,7 +12,7 @@ widget ExampleWindow:
   Window("Hello, world!"):
     Text: "This is some useful text."
     Checkbox("Demo Window", self.show_demo)
-    Slider("float", self.somefloat, rng = 0'f32..1.0'f32)
+    SliderInput("float", self.somefloat, rng = 0'f32..1.0'f32)
 
     Horizontal:
       Button("Button"):

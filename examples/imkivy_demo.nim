@@ -42,7 +42,7 @@ widget WidgetsBasic:
 
     Horizontal:
       Button("Button"):
-        on_press: self.counter.inc()
+        onPress: self.counter.inc()
       ShowWhen((self.counter mod 2) == 1):
         Text("Thanks for clicking me! ")
 
@@ -69,11 +69,11 @@ widget WidgetsBasic:
       ArrowButton("##left"):
         repeat: true
         dir: ImGuiDir.Left
-        on_press: self.rptCounter.dec()
+        onPress: self.rptCounter.dec()
       ArrowButton("##right"):
         repeat: true
         dir: ImGuiDir.Right
-        on_press: self.rptCounter.inc()
+        onPress: self.rptCounter.inc()
       Text("%d", self.rptCounter)
 
     Horizontal:
@@ -101,17 +101,17 @@ widget WidgetsBasic:
     Input("input scientific:", self.inputFloat, step=0.1'f32, format = "%e")
     DragInput("drag int", self.dragInt, rng = -100'i32..100'i32)
     DragInput("drag float", self.dragFlt, rng = -100'f32..100'f32)
-    Slider("slider int", self.sliderInt, rng = -100'i32..100'i32)
-    Slider("slider float", self.sliderFloat, rng = -100'f32..100'f32)
-    Slider("slider float log", self.sliderFloat2, rng = -100'f32..100'f32, flags=Logarithmic)
-    Slider("slider float deg", self.sliderFloat3, rng = -360'f32..360'f32, format = "%.3f def")
+    SliderInput("slider int", self.sliderInt, rng = -100'i32..100'i32)
+    SliderInput("slider float", self.sliderFloat, rng = -100'f32..100'f32)
+    SliderInput("slider float log", self.sliderFloat2, rng = -100'f32..100'f32, flags=Logarithmic)
+    SliderInput("slider float deg", self.sliderFloat3, rng = -360'f32..360'f32, format = "%.3f def")
 
     # PlotDataLines("Frame Times", arr)
     # PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
 
     # const char* elems_names[Element_COUNT] = { "Fire", "Earth", "Air", "Water" };
     # const char* elem_name = (elem >= 0 && elem < Element_COUNT) ? elems_names[elem] : "Unknown";
-    Slider("slider enum", self.sliderElement)
+    SliderInput("slider enum", self.sliderElement)
     let listItems = ["Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon"]
     ListBox("listbox", self.listIndex, listItems)
     ShowOnItemIsHovered:
@@ -173,15 +173,16 @@ widget WidgetsOther:
   CollapsingHeader("Vertical Sliders"):
     let spacing = 4.0'f32
     withStyle(ItemSpacing, ImVec2(x: spacing, y: spacing)):
-      Slider("##int", self.intVal, rng = 0'i32..5'i32,
+      SliderInput("##int", self.intVal, rng = 0'i32..5'i32,
             orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
       SameLine()
     # Colored Sliders
     for clr in PrimaryColors.low..PrimaryColors.high:
       WidgetUniqueId(clr.ord()):
         withColor(clr):
-          Slider("##v", self.values[clr.ord], rng = 0.0'f32..1.0'f32)
-          # orientation: Orient(dir: Vert, size: ImVec2(x: 28, y: 160))
+          Slider("##v", self.values[clr.ord]):
+            rng: 0.0'f32..1.0'f32
+            orientation: Orient(dir: Vert, size: ImVec2(x: 28, y: 160))
           ShowOnItemIsHovered:
             SetTooltip("%.3f", self.values[clr.ord])
         SameLine()
@@ -189,7 +190,7 @@ widget WidgetsOther:
     # Debug button
     Button("Button"):
       size: (50, 20)
-      on_press: 
+      onPress: 
         echo "vertial sliders: ", repr(self.values)
 
 ImKivyMain():
@@ -211,7 +212,7 @@ ImKivyMain():
            1000.0f / igGetIO().framerate, igGetIO().framerate)
       Button("Button"):
         size: (50, 20)
-        on_press: 
+        onPress: 
           echo "demoData: ", repr(bdData)
 
     Window("Widgets"):

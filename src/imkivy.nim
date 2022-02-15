@@ -27,9 +27,6 @@ macro Text*(args: varargs[untyped]) =
 template Checkbox*(label: string, val: var bool) =
   igCheckbox(label, val.addr)
 
-template Slider*(label: string, val: var float, min = 0.0, max = 1.0) =
-  igSliderFloat(label, val.addr, min, max)
-
 template SameLine*() = igSameLine()
 
 proc PushStyleColor*(idx: ImGuiCol, col: ImVec4) =
@@ -144,9 +141,6 @@ template Button*(label: string, blk: untyped) =
 template ArrowButton*(label: string, blk: untyped) =
   mkButton(label, igArrowButton, blk)
 
-template Slider*(label: string, val: var float, min = 0.0, max = 1.0) =
-  igSliderFloat(label, val.addr, min, max)
-
 template RadioButton*(label: string, idx: var int32, val: int) =
   mkUniqueId():
     igRadioButton(label, idx.addr, val)
@@ -208,9 +202,23 @@ type
     of Vert:
       size*: ImVec2
 
-proc Slider*[T: enum](label: string, val: var T;
-                      orient: Orient = Orient(dir: Horiz),
-                      ): bool {.discardable.} =
+macro Slider*(label: untyped, val: untyped; blk: untyped) =
+  proc mkParam(a: string, b: NimNode): NimNode = nnkExprEqExpr.newTree(ident(a), b)
+  var ncall = nnkCall.newTree(ident "SliderInput")
+  ncall.add(mkParam("label", label))
+  ncall.add(mkParam("val", val))
+  for attrName, code in blk.findAttributes().pairs():
+    echo "ATTR: ", attrName
+    case attrName:
+    of "format": ncall.add mkParam("format", code)
+    of "rng": ncall.add mkParam("rng", code)
+    of "orientation": ncall.add mkParam("orient", code)
+  result = ncall
+
+proc SliderInput*[T: enum](label: string, val: var T;
+                           rng = 0'i32..0'i32;
+                           orient: Orient = Orient(dir: Horiz),
+                          ): bool {.discardable.} =
   mkUniqueId:
     case orient.dir:
     of Horiz:
@@ -218,10 +226,11 @@ proc Slider*[T: enum](label: string, val: var T;
     of Vert:
       result = igVSliderInt(label.cstring, orient.size, cast[ptr int32](val.addr), 0, T.enumLen()-1, $val)
 
-proc Slider*(label: string, val: var int32, rng = 0'i32..0'i32;
-             format = "%.3f",
-             orient: Orient = Orient(dir: Horiz),
-             flags = 0.ImGuiSliderFlags): bool {.discardable.} =
+proc SliderInput*(label: string, val: var int32,
+                  rng = 0'i32..0'i32;
+                  format = "%.3f",
+                  orient: Orient = Orient(dir: Horiz),
+                  flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId:
     case orient.dir:
     of Horiz:
@@ -229,11 +238,12 @@ proc Slider*(label: string, val: var int32, rng = 0'i32..0'i32;
     of Vert:
       result = igVSliderInt(label.cstring, orient.size, val.addr, rng.a, rng.b, format, flags)
 
-proc Slider*(label: string, val: var float32, rng = 0'f32..0'f32;
-             format = "%.3f",
-             orient: Orient = Orient(dir: Horiz),
-             log = false,
-             flags = 0.ImGuiSliderFlags): bool {.discardable.} =
+proc SliderInput*(label: string, val: var float32,
+                  rng = 0'f32..0'f32;
+                  format = "%.3f",
+                  orient: Orient = Orient(dir: Horiz),
+                  log = false,
+                  flags = 0.ImGuiSliderFlags): bool {.discardable.} =
   mkUniqueId:
     case orient.dir:
     of Horiz:
