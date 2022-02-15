@@ -28,7 +28,6 @@ widget ExampleWindow:
 
 when isMainModule:
   ImKivyMain():
-    var show_demo: bool = true
     var bdData = ExampleWindowData()
 
     ImKivyLoop:
