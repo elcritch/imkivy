@@ -17,10 +17,10 @@ widget ExampleWindow:
     Horizontal:
       Button("Button"):
         size: (50, 20)
-        on_press: inc(self.counter)
+        onPress: inc(self.counter)
       Button("Button"):
         size: (50, 20)
-        on_press: inc(self.counter)
+        onPress: inc(self.counter)
       Text("counter = %d", self.counter)
 
     Text("Application average %.3f ms/frame (%.1f FPS)",

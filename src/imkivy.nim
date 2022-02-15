@@ -103,7 +103,7 @@ macro mkButton(label: string, btn, blk: untyped) =
 
   for attrName, code in blk.findAttributes().pairs():
     case attrName:
-    of "on_press": onPressAct = code
+    of "onPress": onPressAct = code
     of "repeat": repeatProp = code
     of "dir": dirProp = code
     of "size":
