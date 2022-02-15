@@ -3,6 +3,7 @@ import sugar
 import strutils
 import std/typetraits
 import std/enumutils
+import std/tables
 
 export sugar, strutils, enumutils
 
@@ -89,28 +90,29 @@ template WidgetUniqueId*(id: int, blk: untyped) =
 template PushID*(id: int) = igPushID(id.int32)
 template PopID*() = igPopId()
 
-macro mkButton(label: string, btn, blk: untyped) =
-  var
-    onPressAct: NimNode
-    sizeProp: NimNode
-    dirProp: NimNode
-    repeatProp: NimNode
+proc findAttributes*(blk: NimNode): TableRef[string, NimNode] =
+  result = newTable[string, NimNode]()
+  for item in blk:
+    if item.kind == nnkCall:
+      var name = item[0].repr
+      var code = item[1]
+      result[name] = code
 
-  for code in blk:
-    if code.kind == nnkCall:
-      var name = code[0]
-      case name.repr:
-      of "on_press":
-        onPressAct = code[1]
-      of "repeat":
-        repeatProp = code[1]
-      of "dir":
-        dirProp = code[1]
-      of "size":
-        let val = code[1]
-        sizeProp = quote do:
-          let sz = `val`
+macro mkButton(label: string, btn, blk: untyped) =
+  var onPressAct, sizeProp, dirProp, repeatProp: NimNode
+
+  for attrName, code in blk.findAttributes().pairs():
+    case attrName:
+    of "on_press": onPressAct = code
+    of "repeat": repeatProp = code
+    of "dir": dirProp = code
+    of "size":
+      sizeProp =
+        quote do:
+          let sz = `code`
           ImVec2(x: sz[0].toFloat(), y: sz[1].toFloat())
+    else:
+      error("other: " & attrName)
 
   var arg1: NimNode =
     if btn.strVal == "igArrowButton": dirProp

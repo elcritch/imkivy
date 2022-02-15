@@ -180,8 +180,8 @@ widget WidgetsOther:
     for clr in PrimaryColors.low..PrimaryColors.high:
       WidgetUniqueId(clr.ord()):
         withColor(clr):
-          Slider("##v", self.values[clr.ord], rng = 0.0'f32..1.0'f32,
-                  orient=Orient(dir: Vert, size: ImVec2(x: 28, y: 160)))
+          Slider("##v", self.values[clr.ord], rng = 0.0'f32..1.0'f32)
+          # orientation: Orient(dir: Vert, size: ImVec2(x: 28, y: 160))
           ShowOnItemIsHovered:
             SetTooltip("%.3f", self.values[clr.ord])
         SameLine()
