@@ -7,7 +7,9 @@ import ../imkivy
 
 import std/os, std/times, std/monotimes
 
-template ImKivyLoop*(loop: untyped) =
+export monotimes
+
+template ImKivyLoop*(loopCode: untyped) =
     while not w.windowShouldClose:
       glfwPollEvents()
 
@@ -15,10 +17,7 @@ template ImKivyLoop*(loop: untyped) =
       igGlfwNewFrame()
       igNewFrame()
 
-      if show_demo:
-        igShowDemoWindow(show_demo.addr)
-
-      loop
+      loopCode
 
       igRender()
 
