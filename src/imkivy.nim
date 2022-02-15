@@ -212,7 +212,7 @@ macro Slider*(label: untyped, val: untyped; blk: untyped) =
     case attrName:
     of "format": ncall.add mkParam("format", code)
     of "rng": ncall.add mkParam("rng", code)
-    of "orientation": ncall.add mkParam("orient", code)
+    of "orientation", "orient": ncall.add mkParam("orient", code)
   result = ncall
 
 proc SliderInput*[T: enum](label: string, val: var T;
