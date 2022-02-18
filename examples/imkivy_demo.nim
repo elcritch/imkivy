@@ -203,6 +203,10 @@ ImKivyMain():
   let values: array[7, float32] = [0.0'f32, 0.60, 0.35, 0.9, 0.70, 0.20, 0.0]
   var woData = WidgetsOtherData(values: values)
 
+  let fonts: ptr ImFontAtlas = igGetIO().fonts
+  # fonts.addFontDefault()
+  fonts.addFontFromFileTTF("Roboto-Medium.ttf", 16.0)
+
   ImKivyLoop:
     if show_demo:
       igShowDemoWindow(show_demo.addr)
