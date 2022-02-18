@@ -9,6 +9,8 @@ import std/os, std/times, std/monotimes
 
 export monotimes
 
+# proc newFontConfig*(): ptr ImFontConfig {.importc: "ImFontConfig_ImFontConfig".}
+
 template ImKivyLoop*(loopCode: untyped) =
     while not w.windowShouldClose:
       glfwPollEvents()

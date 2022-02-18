@@ -191,7 +191,7 @@ widget WidgetsOther:
     
     # Debug button
     Button("Button"):
-      size: (50, 20)
+      size: (60, 30)
       onPress: 
         echo "vertial sliders: ", repr(self.values)
 
@@ -203,9 +203,19 @@ ImKivyMain():
   let values: array[7, float32] = [0.0'f32, 0.60, 0.35, 0.9, 0.70, 0.20, 0.0]
   var woData = WidgetsOtherData(values: values)
 
+  let style = igGetStyle()
+  style.frameRounding     = 5.0f
+
+  let fc = newImFontConfig()
+  when defined(HiDpiFonts):
+    fc.oversampleH = 8 # // FIXME: 2 may be a better default?
+    fc.oversampleV = 8 #
+    fc.rasterizerMultiply = 1.0f #
+
   let fonts: ptr ImFontAtlas = igGetIO().fonts
   # fonts.addFontDefault()
-  fonts.addFontFromFileTTF("Roboto-Medium.ttf", 16.0)
+  fonts.addFontFromFileTTF("Roboto-Medium.ttf", 18.0, fc)
+  fonts.build()
 
   ImKivyLoop:
     if show_demo:
